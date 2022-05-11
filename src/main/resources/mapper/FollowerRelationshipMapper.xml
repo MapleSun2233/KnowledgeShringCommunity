@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bluemaple.knowledgesharingcommunity.mapper.FollowerRelationshipMapper">
+    <insert id="addRecord">
+        insert into follower_relationship (follower_id,target_id) values (#{followerId},#{targetId})
+    </insert>
+    <delete id="removeRecord">
+        delete from follower_relationship where follower_id = #{followerId} and target_id = #{targetId}
+    </delete>
+    <select id="hasRecord" resultType="boolean">
+        select count(*) from follower_relationship where follower_id = #{followerId} and target_id = #{targetId}
+    </select>
+    <select id="countFollowers" resultType="int">
+        select count(*) from follower_relationship where target_id = #{targetId}
+    </select>
+    <select id="countTargets" resultType="int">
+        select count(*) from follower_relationship where follower_id = #{followerId}
+    </select>
+
+
+    <select id="countArticles" resultType="int">
+        select count(*) from article where publisher_id = #{userId}
+    </select>
+    <resultMap id="userInfoMap" type="UserInfo">
+        <association property="articles" column="userId" javaType="int" select="countArticles"/>
+        <association property="followers" column="userId" javaType="int" select="countFollowers"/>
+    </resultMap>
+
+    <select id="getFollowerList" resultMap="userInfoMap">
+        select follower_id as userId, username, nickname, photo,contribution from follower_relationship,user where target_id = #{targetId} and id = follower_id
+    </select>
+    <select id="getTargetList" resultMap="userInfoMap">
+        select target_id as user_id, username, nickname, photo,contribution from follower_relationship,user where follower_id = #{followerId} and id = target_id
+    </select>
+</mapper>

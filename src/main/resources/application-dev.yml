@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.55.55:3306/ksc?useSSL=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+    hikari:
+      max-lifetime: 120000  # 毫秒级
+  transaction:
+    rollback-on-commit-failure: true
+  redis:
+    host: 192.168.55.55
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: net.bluemaple.knowledgesharingcommunity.pojo
+
+# OSS的配置，它被手动注入到配置类中的，而不是自动配置的
+minio:
+  end-point: http://47.99.131.235:9001
+  access-key: maple
+  secret-key: sun110100
+  bucket-name: ksc
+server:
+  servlet:
+    session:
+      cookie:
+        max-age: 3600s   # 保留session一个小时

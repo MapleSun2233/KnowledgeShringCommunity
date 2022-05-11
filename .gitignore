@@ -1,0 +1,4 @@
+web-ui/node_modules
+src/main/resources/application_prod.yml
+src/main/resources/application_dev.yml
+target

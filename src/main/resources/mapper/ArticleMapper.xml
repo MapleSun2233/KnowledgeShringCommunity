@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bluemaple.knowledgesharingcommunity.mapper.ArticleMapper">
+    <select id="getUserById" resultType="User">
+        select id,username,nickname,photo,contribution,join_time from user where id = #{publisher_id};
+    </select>
+    <resultMap id="articleResultMap" type="Article">
+        <association property="publisher" column="publisher_id" javaType="User" select="getUserById"/>
+    </resultMap>
+    <select id="getArticleById" resultMap="articleResultMap">
+        select * from article where id = #{id}
+    </select>
+
+    <resultMap id="articleInfoMap" type="ArticleInfo">
+        <result property="articleId" column="id"/>
+        <association property="thumbs" column="id" javaType="int" select="getThumbs"/>
+        <association property="collections" column="id" javaType="int" select="getCollections"/>
+        <association property="comments" column="id" javaType="int" select="getComments"/>
+    </resultMap>
+    <select id="getThumbs" resultType="int">
+        select count(*) from thumb_relationship where article_id = #{id}
+    </select>
+    <select id="getCollections" resultType="int">
+        select count(*) from collection_relationship where article_id = #{id}
+    </select>
+    <select id="getComments" resultType="int">
+        select count(*) from comments where article_id = #{id}
+    </select>
+    <select id="getMyArticleList" resultMap="articleInfoMap">
+        select id , headline, views, post_time from article where publisher_id = #{id}
+    </select>
+    
+    
+    <insert id="postArticle"  keyProperty="id"  useGeneratedKeys="true" parameterType="Article">
+        insert into article (headline, tags, content, publisher_id)
+        values (#{headline},#{tags},#{content},#{publisher.id})
+    </insert>
+    <select id="getAuthorIdByArticleId" resultType="int">
+        select publisher_id from article where id = #{id}
+    </select>
+    <update id="addViewsByArticleId">
+        update article set views = views+1 where id = #{id};
+    </update>
+    <delete id="removeArticleById">
+        delete from article where id = #{id}
+    </delete>
+
+    <select id="getAPageArticleListByNew" resultMap="articleInfoMap">
+        select id, headline, views, post_time from article order by post_time desc limit  #{page}, 10
+    </select>
+    <select id="getAPageArticleListByViews" resultMap="articleInfoMap">
+        select id, headline, views, post_time from article order by views desc limit #{page}, 10
+    </select>
+    <select id="getAPageArticleListByFollow" resultMap="articleInfoMap">
+        select id, headline, views, publisher_id, post_time from article, follower_relationship where  follower_id = #{userId} and target_id = publisher_id limit #{page},10
+    </select>
+
+    <resultMap id="commentMap" type="Comment">
+        <association property="publisher" column="user_id" javaType="User" select="getUserById"/>
+    </resultMap>
+    <insert id="addComment">
+        insert into comments (user_id,article_id,content) values (#{userId},#{articleId},#{content})
+    </insert>
+    <select id="getAllCommentsForThisArticle" resultMap="commentMap">
+        select * from comments where article_id = #{id}
+    </select>
+    <delete id="removeAllRecordByArticleId">
+        delete from comments where article_id = #{id}
+    </delete>
+
+    <select id="queryByKeywords" parameterType="java.lang.String" resultMap="articleInfoMap">
+        select id, headline, tags , views, post_time from article where headline regexp #{exp} or tags regexp #{exp}
+    </select>
+</mapper>

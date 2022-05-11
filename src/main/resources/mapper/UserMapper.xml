@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bluemaple.knowledgesharingcommunity.mapper.UserMapper">
+    <select id="getByUsername" resultType="User">
+        select user.id as id,username,password,nickname,photo,contribution,join_time,role_type from user,role where user.role_id = role.id and username = #{username}
+    </select>
+    <select id="getById" resultType="User">
+        select user.id as id,username,password,nickname,photo,contribution,join_time,role_type from user,role where user.role_id = role.id and user.id = #{id}
+    </select>
+    <select id="hasUsername" resultType="int">
+        select count(1) from user where username = #{username}
+    </select>
+    <insert id="register"  keyProperty="id"  useGeneratedKeys="true" parameterType="User">
+        insert into user (username,password,role_id) values (#{username},#{password},2)
+    </insert>
+    <update id="updateNicknameAndPhoto">
+        update user set nickname = #{nickname}, photo = #{photo} where id = #{id}
+    </update>
+    <update id="addContributionById">
+        update user set contribution = contribution+#{val} where id = #{id}
+    </update>
+    <update id="subtractContributionById">
+        update user set contribution = contribution-#{val} where id = #{id}
+    </update>
+    <update id="addContributionByArticleId">
+        update user set contribution = contribution+#{val} where user.id = (select publisher_id from article where article.id = #{id})
+    </update>
+    <update id="subtractContributionByArticleId">
+        update user set contribution = contribution-#{val} where user.id = (select publisher_id from article where article.id = #{id})
+    </update>
+
+    <select id="getContributionTop10" resultType="UserInfo">
+        select id as user_id, username, nickname, photo, contribution, (select count(*) from follower_relationship where target_id = id and follower_id = #{userId}) as followed from user order by contribution desc limit 0,10
+    </select>
+
+    <select id="getMostQuestionTop10" resultType="UserInfo">
+        select id as user_id, username, nickname, photo, (select count(*) from question where publisher_id = id) as questions, (select count(*) from follower_relationship where target_id = id and follower_id = #{userId}) as followed from user order by contribution desc limit 0,10
+    </select>
+</mapper>

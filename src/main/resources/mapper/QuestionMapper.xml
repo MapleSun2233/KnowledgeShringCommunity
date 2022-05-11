@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bluemaple.knowledgesharingcommunity.mapper.QuestionMapper">
+    <select id="getUserById" resultType="User">
+        select id,username,nickname,photo,contribution,join_time from user where id = #{publisher_id};
+    </select>
+    <resultMap id="questionResultMap" type="Question">
+        <association property="publisher" column="publisher_id" javaType="User" select="getUserById"/>
+    </resultMap>
+    <select id="getQuestionById" resultMap="questionResultMap">
+        select * from question where id = #{id}
+    </select>
+    <insert id="postQuestion"  keyProperty="id"  useGeneratedKeys="true" parameterType="Question">
+        insert into question (headline, tags, content, publisher_id)
+        values (#{headline},#{tags},#{content},#{publisher.id})
+    </insert>
+    <update id="addViewsByQuestionId">
+        update question set views = views+1 where id = #{id};
+    </update>
+    <select id="getPublisherIdByQuestionId" resultType="int">
+        select publisher_id from question where id = #{id}
+    </select>
+    <select id="hasQuestions" resultType="int">
+        select count(*) from question where publisher_id = #{id}
+    </select>
+    <select id="hasAnswers" resultType="int">
+        select count(*) from answers where user_id = #{id}
+    </select>
+    <insert id="addAnswer">
+        insert into answers (user_id, question_id, content) values (#{userId},#{questionId},#{content})
+    </insert>
+
+    <resultMap id="answerMap" type="Answer">
+        <association property="publisher" column="user_id" javaType="User" select="getUserById"/>
+    </resultMap>
+    <select id="getAllAnswersForThisQuestion" resultMap="answerMap">
+        select * from answers where question_id = #{id}
+    </select>
+    <delete id="removeAllAnswersByQuestionId">
+        delete from answers where question_id = #{id}
+    </delete>
+    <delete id="removeQuestion">
+        delete from question where id = #{id}
+    </delete>
+    <select id="hasAnswersByQuestionId" resultType="int">
+        select count(*) from answers where question_id = #{id}
+    </select>
+    <resultMap id="questionInfoMap" type="QuestionInfo">
+        <result property="questionId" column="id"/>
+        <association property="answers" column="id" javaType="int" select="hasAnswersByQuestionId"/>
+    </resultMap>
+    <select id="getMyQuestionList" resultMap="questionInfoMap">
+        select id, headline, views, post_time from question where publisher_id = #{id}
+    </select>
+
+    <select id="getAPageQuestionListByNew" resultMap="questionInfoMap">
+        select id, headline, views, post_time from question order by post_time desc limit  #{page}, 10
+    </select>
+    <select id="getAPageQuestionListByViews" resultMap="questionInfoMap">
+        select id, headline, views, post_time from question order by views desc limit #{page}, 10
+    </select>
+    <select id="getAPageQuestionListByFollow" resultMap="questionInfoMap">
+        select id, headline, views, publisher_id, post_time from question, follower_relationship where  follower_id = #{userId} and target_id = publisher_id limit #{page},10
+    </select>
+    <select id="queryByKeywords" parameterType="java.lang.String" resultMap="questionInfoMap">
+        select id, headline, tags , views, post_time from question where headline regexp #{exp} or tags regexp #{exp}
+    </select>
+</mapper>

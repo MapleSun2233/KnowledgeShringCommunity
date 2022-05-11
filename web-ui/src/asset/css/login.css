@@ -1,0 +1,21 @@
+#login{
+    width:100vw;
+    height:100vh;
+    background-image: url('../img/bg.jpg');
+    background-size: 100% auto;
+    background-position: center;
+    /* overflow: hidden; */
+}
+#login form{
+    background-color: #fff;
+    padding:2em;
+    border-radius: 0.5em;
+    margin-top:20vh;
+}
+#login form h2{
+    text-align:center;
+}
+#btnBox{
+    display: flex;
+    justify-content: space-around;
+}

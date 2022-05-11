@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.bluemaple.knowledgesharingcommunity.mapper.CollectionRelationshipMapper">
+    <insert id="addRecord">
+        insert into collection_relationship (article_id,user_id) values (#{articleId},#{userId})
+    </insert>
+    <delete id="removeRecord">
+        delete from collection_relationship where article_id = #{articleId} and user_id = #{userId}
+    </delete>
+    <delete id="removeAllRecordByArticleId">
+        delete from collection_relationship where article_id = #{articleId}
+    </delete>
+    <select id="hasRecord" resultType="boolean">
+        select count(*) from collection_relationship where article_id = #{articleId} and user_id = #{userId}
+    </select>
+    <select id="countRecord" resultType="int">
+        select count(*) from collection_relationship where article_id = #{articleId}
+    </select>
+
+    <resultMap id="articleInfoMap" type="ArticleInfo">
+        <result property="articleId" column="article_id"/>
+        <association property="headline" column="article_id" javaType="java.lang.String" select="getHeadline"/>
+        <association property="thumbs" column="article_id" javaType="int" select="getThumbs"/>
+        <association property="collections" column="article_id" javaType="int" select="getCollections"/>
+        <association property="comments" column="article_id" javaType="int" select="getComments"/>
+    </resultMap>
+    <select id="getHeadline" resultType="java.lang.String">
+        select headline from article where id = #{id}
+    </select>
+    <select id="getThumbs" resultType="int">
+        select count(*) from thumb_relationship where article_id = #{id}
+    </select>
+    <select id="getCollections" resultType="int">
+        select count(*) from collection_relationship where article_id = #{id}
+    </select>
+    <select id="getComments" resultType="int">
+        select count(*) from comments where article_id = #{id}
+    </select>
+    <select id="listAllCollectionsByUserId" resultMap="articleInfoMap">
+        select article_id from collection_relationship where user_id = #{userId}
+    </select>
+</mapper>
