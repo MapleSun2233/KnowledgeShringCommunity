@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
     public boolean login(User user, String rawPassword, String uuid) {
         if(!isCorrectPassword(rawPassword, user.getPassword()))
             return false;
-        System.out.println(uuid);
         redisTemplate.opsForValue().set(uuid,user);
         restTokenExpire(uuid);
         return true;
