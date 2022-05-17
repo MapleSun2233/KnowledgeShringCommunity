@@ -3,11 +3,11 @@ package net.bluemaple.knowledgesharingcommunity.service.impl;
 import net.bluemaple.knowledgesharingcommunity.mapper.*;
 import net.bluemaple.knowledgesharingcommunity.pojo.*;
 import net.bluemaple.knowledgesharingcommunity.service.QuestionService;
+import net.bluemaple.knowledgesharingcommunity.uniformData.AcceptAnswerPostData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -15,6 +15,8 @@ import java.util.List;
 public class QuestionServiceImpl implements QuestionService {
     @Resource
     private QuestionMapper questionMapper;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     @Transactional
@@ -92,5 +94,19 @@ public class QuestionServiceImpl implements QuestionService {
     public List<QuestionInfo> queryQuestionByKeywords(String keywords) {
         String exp = String.join("|",keywords.split("\\s+"));
         return questionMapper.queryByKeywords(exp);
+    }
+
+    @Override
+    public int acceptAnswer(AcceptAnswerPostData acceptAnswerPostData) {
+        questionMapper.acceptAnswer(acceptAnswerPostData);
+        userMapper.addContributionById(5,acceptAnswerPostData.getUserId());
+        return 0;
+    }
+
+    @Override
+    public int cancelAcceptAnswer(AcceptAnswerPostData acceptAnswerPostData) {
+        questionMapper.cancelAcceptAnswer(acceptAnswerPostData);
+        userMapper.subtractContributionById(5,acceptAnswerPostData.getUserId());
+        return 0;
     }
 }

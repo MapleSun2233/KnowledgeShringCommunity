@@ -32,10 +32,10 @@
     </update>
 
     <select id="getContributionTop10" resultType="UserInfo">
-        select id as user_id, username, nickname, photo, contribution, (select count(*) from follower_relationship where target_id = id and follower_id = #{userId}) as followed from user order by contribution desc limit 0,10
+        select id as user_id, username, nickname, photo, contribution, (select count(*) from follower_relationship where target_id = user_id and follower_id = #{userId}) as followed from user order by contribution desc limit 0,10
     </select>
 
     <select id="getMostQuestionTop10" resultType="UserInfo">
-        select id as user_id, username, nickname, photo, (select count(*) from question where publisher_id = id) as questions, (select count(*) from follower_relationship where target_id = id and follower_id = #{userId}) as followed from user order by contribution desc limit 0,10
+        select id as user_id, username, nickname, photo, (select count(*) from question where publisher_id = user_id) as questions, (select count(*) from follower_relationship where target_id = id and follower_id = #{userId}) as followed from user order by questions desc limit 0,10
     </select>
 </mapper>

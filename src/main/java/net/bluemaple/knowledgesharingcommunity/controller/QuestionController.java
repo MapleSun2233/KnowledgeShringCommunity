@@ -78,4 +78,14 @@ public class QuestionController {
     public UniformMessage search(@PathVariable("keywords") String keywords){
         return new UniformMessage(200,"",questionService.queryQuestionByKeywords(keywords));
     }
+    @PostMapping("acceptAnswer")
+    public UniformMessage handleAccept(@RequestBody AcceptAnswerPostData acceptAnswerPostData){
+        questionService.acceptAnswer(acceptAnswerPostData);
+        return new UniformMessage(200,"",null);
+    }
+    @DeleteMapping("acceptAnswer")
+    public UniformMessage cancelAccept(@RequestBody AcceptAnswerPostData acceptAnswerPostData){
+        questionService.cancelAcceptAnswer(acceptAnswerPostData);
+        return new UniformMessage(200,"",null);
+    }
 }

@@ -2,6 +2,7 @@ package net.bluemaple.knowledgesharingcommunity.service;
 
 
 import net.bluemaple.knowledgesharingcommunity.pojo.*;
+import net.bluemaple.knowledgesharingcommunity.uniformData.AcceptAnswerPostData;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface QuestionService {
     List<QuestionInfo> getAPageQuestionListByViews(int page);
     List<QuestionInfo> getAPageQuestionListByFollow(int page, int id);
     List<QuestionInfo> queryQuestionByKeywords(String keywords);
+    int acceptAnswer(AcceptAnswerPostData acceptAnswerPostData);
+    int cancelAcceptAnswer(AcceptAnswerPostData acceptAnswerPostData);
 }

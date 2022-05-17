@@ -11,4 +11,5 @@ public class Answer{
     private int questionId;
     private String content;
     private Date postTime;
+    private boolean accepted;
 }

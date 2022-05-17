@@ -4,6 +4,7 @@ import net.bluemaple.knowledgesharingcommunity.pojo.Answer;
 import net.bluemaple.knowledgesharingcommunity.pojo.QuestionInfo;
 import net.bluemaple.knowledgesharingcommunity.pojo.Question;
 import net.bluemaple.knowledgesharingcommunity.pojo.QuestionInfo;
+import net.bluemaple.knowledgesharingcommunity.uniformData.AcceptAnswerPostData;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,4 +28,6 @@ public interface QuestionMapper {
     List<QuestionInfo> getAPageQuestionListByViews(int page);
     List<QuestionInfo> getAPageQuestionListByFollow(@Param("page") int page, @Param("userId") int userId);
     List<QuestionInfo> queryByKeywords(String exp);
+    int acceptAnswer(AcceptAnswerPostData acceptAnswerPostData);
+    int cancelAcceptAnswer(AcceptAnswerPostData acceptAnswerPostData);
 }

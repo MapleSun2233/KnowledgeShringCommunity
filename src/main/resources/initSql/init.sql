@@ -1,9 +1,6 @@
-create
-database ksc default charset=utf8;
+create database ksc default charset=utf8;
 
-use
-ksc;
-
+use ksc;
 
 DROP TABLE
     IF EXISTS follower_relationship;
@@ -12,19 +9,17 @@ DROP TABLE
 DROP TABLE
     IF EXISTS thumb_relationship;
 DROP TABLE
-    IF EXISTS article;
+    IF EXISTS answers;
+DROP TABLE
+    IF EXISTS comments;
 DROP TABLE
     IF EXISTS question;
+DROP TABLE
+    IF EXISTS article;
 DROP TABLE
     IF EXISTS user;
 DROP TABLE
     IF EXISTS role;
-DROP TABLE
-    IF EXISTS comments;
-DROP TABLE
-    IF EXISTS answers;
-DROP TABLE
-    IF EXISTS sub_comments;
 
 CREATE TABLE `role`
 (
@@ -34,9 +29,7 @@ CREATE TABLE `role`
 
 INSERT INTO role (id, role_type)
 VALUES (1, 'admin'),
-       (2, 'memeber');
-
-
+       (2, 'member');
 
 CREATE TABLE `user`
 (
@@ -86,37 +79,6 @@ CREATE TABLE `question`
     INDEX (`tags`)
 ) ENGINE = INNODB DEFAULT charset = utf8;
 
-CREATE TABLE `thumb_relationship`
-(
-    `article_id` INT NOT NULL,
-    `user_id`    INT NOT NULL,
-    PRIMARY KEY (`article_id`, `user_id`),
-    FOREIGN KEY (`article_id`) REFERENCES article (`id`),
-    FOREIGN KEY (`user_id`) REFERENCES user (`id`)
-) ENGINE = INNODB DEFAULT charset = utf8;
-
-
-
-CREATE TABLE `collection_relationship`
-(
-    `article_id` INT NOT NULL,
-    `user_id`    INT NOT NULL,
-    PRIMARY KEY (`article_id`, `user_id`),
-    FOREIGN KEY (`article_id`) REFERENCES article (`id`),
-    FOREIGN KEY (`user_id`) REFERENCES user (`id`)
-) ENGINE = INNODB DEFAULT charset = utf8;
-
-
-
-CREATE TABLE `follower_relationship`
-(
-    `follower_id` INT NOT NULL,
-    `target_id`   INT NOT NULL,
-    PRIMARY KEY (`follower_id`, `target_id`),
-    FOREIGN KEY (`follower_id`) REFERENCES user (`id`),
-    FOREIGN KEY (`target_id`) REFERENCES user (`id`)
-) ENGINE = INNODB DEFAULT charset = utf8;
-
 CREATE TABLE `comments`
 (
     `id`         INT       NOT NULL auto_increment,
@@ -130,7 +92,6 @@ CREATE TABLE `comments`
     INDEX(`article_id`)
 ) ENGINE = INNODB DEFAULT charset = utf8;
 
-
 CREATE TABLE `answers`
 (
     `id`          INT       NOT NULL auto_increment,
@@ -138,8 +99,37 @@ CREATE TABLE `answers`
     `question_id` INT       NOT NULL,
     `content`     LONGTEXT  NOT NULL,
     `post_time`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `accepted`    BOOLEAN   DEFAULT FALSE,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES user (`id`),
     FOREIGN KEY (`question_id`) REFERENCES question (`id`),
     INDEX(`question_id`)
+) ENGINE = INNODB DEFAULT charset = utf8;
+
+CREATE TABLE `thumb_relationship`
+(
+    `article_id` INT NOT NULL,
+    `user_id`    INT NOT NULL,
+    PRIMARY KEY (`article_id`, `user_id`),
+    FOREIGN KEY (`article_id`) REFERENCES article (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES user (`id`)
+) ENGINE = INNODB DEFAULT charset = utf8;
+
+CREATE TABLE `collection_relationship`
+(
+    `article_id` INT NOT NULL,
+    `user_id`    INT NOT NULL,
+    PRIMARY KEY (`article_id`, `user_id`),
+    FOREIGN KEY (`article_id`) REFERENCES article (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES user (`id`)
+) ENGINE = INNODB DEFAULT charset = utf8;
+
+
+CREATE TABLE `follower_relationship`
+(
+    `follower_id` INT NOT NULL,
+    `target_id`   INT NOT NULL,
+    PRIMARY KEY (`follower_id`, `target_id`),
+    FOREIGN KEY (`follower_id`) REFERENCES user (`id`),
+    FOREIGN KEY (`target_id`) REFERENCES user (`id`)
 ) ENGINE = INNODB DEFAULT charset = utf8;

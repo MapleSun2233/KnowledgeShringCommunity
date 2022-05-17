@@ -106,6 +106,48 @@ export default function Question(){
             handleMsg("error","回答失败")
         }
     }
+    // 处理采纳
+    const handleAccept = async(answerId)=>{
+        try{
+            await axios.post("/api/acceptAnswer",{
+                questionId:question.id,
+                answerId:answerId
+            },{
+                headers:{
+                    token:store.getState().token
+                }
+            }).then(res=>res.data).then(data=>{
+                if(data.code === 200){
+                    getAnswers(question.id)
+                }else{
+                    handleMsg("error",data.message)
+                }
+            })
+        }catch(e){
+            handleMsg("error","采纳失败")
+        }
+    }
+    const cancelAccept = async(answerId)=>{
+        try{
+            await axios.delete("/api/acceptAnswer",{
+                data:{
+                    questionId:question.id,
+                    answerId:answerId
+                },
+                headers:{
+                    token:store.getState().token
+                }
+            }).then(res=>res.data).then(data=>{
+                if(data.code === 200){
+                    getAnswers(question.id)
+                }else{
+                    handleMsg("error",data.message)
+                }
+            })
+        }catch(e){
+            handleMsg("error","取消采纳失败")
+        }
+    }
     useEffect(()=>{
         axios.get("/api/question/"+id,{
             headers:{
@@ -160,7 +202,7 @@ export default function Question(){
                                 </div>
                             </Col>
                         </Row>
-                        { answers && answers.map((answer,key)=><AnswerItem answer={answer} key={key} />)}
+                        { answers && answers.map((answer,key)=><AnswerItem isHost={store.getState().userInfo.id === question.publisher.id} answer={answer} key={key} handleAccept={handleAccept} cancelAccept={cancelAccept} />)}
                     </div>
                 </Col>
                 <Col md={{span:3}}>

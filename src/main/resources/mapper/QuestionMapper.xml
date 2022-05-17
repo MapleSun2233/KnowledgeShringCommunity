@@ -67,4 +67,17 @@
     <select id="queryByKeywords" parameterType="java.lang.String" resultMap="questionInfoMap">
         select id, headline, tags , views, post_time from question where headline regexp #{exp} or tags regexp #{exp}
     </select>
+
+    <update id="acceptAnswer" parameterType="net.bluemaple.knowledgesharingcommunity.uniformData.AcceptAnswerPostData">
+        <selectKey resultType="java.lang.Integer" keyProperty="userId">
+            select user_id from answers where question_id = #{questionId} and id = #{answerId}
+        </selectKey>
+        update answers set accepted = true where question_id = #{questionId} and id = #{answerId}
+    </update>
+    <update id="cancelAcceptAnswer" parameterType="net.bluemaple.knowledgesharingcommunity.uniformData.AcceptAnswerPostData">
+        <selectKey resultType="java.lang.Integer" keyProperty="userId">
+            select user_id from answers where question_id = #{questionId} and id = #{answerId}
+        </selectKey>
+        update answers set accepted = false where question_id = #{questionId} and id = #{answerId}
+    </update>
 </mapper>
