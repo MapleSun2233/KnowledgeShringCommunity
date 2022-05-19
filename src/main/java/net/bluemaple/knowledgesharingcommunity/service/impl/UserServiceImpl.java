@@ -4,20 +4,19 @@ import net.bluemaple.knowledgesharingcommunity.mapper.UserMapper;
 import net.bluemaple.knowledgesharingcommunity.pojo.User;
 import net.bluemaple.knowledgesharingcommunity.pojo.UserInfo;
 import net.bluemaple.knowledgesharingcommunity.service.UserService;
+import net.bluemaple.knowledgesharingcommunity.util.RedisUtil;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 @Service
 public class UserServiceImpl implements UserService {
     @Resource
-    RedisTemplate<String, Object> redisTemplate;
+    private RedisUtil redisUtil;
     @Resource
     private UserMapper userMapper;
     @Override
@@ -40,8 +39,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(DigestUtils.md5Hex(password));
         userMapper.register(user);
         user = getUserById(user.getId());
-        redisTemplate.opsForValue().set(uuid, user);
-        restTokenExpire(uuid);
+        redisUtil.setToken(uuid, user);
         return user;
     }
 //    验证密码加密后是否与数据库的密码一致
@@ -55,7 +53,7 @@ public class UserServiceImpl implements UserService {
     public User updateUserNicknameAndPhoto(int id,String nickname, String photo, String token) {
         userMapper.updateNicknameAndPhoto(id,nickname,photo);
         User user = getUserById(id);
-        redisTemplate.opsForValue().set(token, user);
+        redisUtil.setToken(token, user);
         return user;
     }
 
@@ -73,28 +71,21 @@ public class UserServiceImpl implements UserService {
     public boolean login(User user, String rawPassword, String uuid) {
         if(!isCorrectPassword(rawPassword, user.getPassword()))
             return false;
-        redisTemplate.opsForValue().set(uuid,user);
-        restTokenExpire(uuid);
+        redisUtil.setToken(uuid,user);
         return true;
     }
 
     @Override
     public User getUserByToken(String token) {
-        return (User)redisTemplate.opsForValue().get(token);
+        return (User)redisUtil.get(token);
     }
 
     @Override
     public boolean logout(String token) {
-        return redisTemplate.delete(token);
+        return redisUtil.removeKey(token);
     }
 
-    @Override
     public boolean isExistToken(String token) {
-        return redisTemplate.hasKey(token);
-    }
-
-    @Override
-    public void restTokenExpire(String token) {
-        redisTemplate.expire(token, 1, TimeUnit.DAYS);
+        return redisUtil.containsKey(token);
     }
 }

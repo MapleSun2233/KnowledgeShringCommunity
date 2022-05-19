@@ -20,6 +20,5 @@ public interface UserService{
     boolean login(User user, String rawPassword, String uuid);
     User getUserByToken(String token);
     boolean isExistToken(String token);
-    void restTokenExpire(String token);
     boolean logout(String token);
 }

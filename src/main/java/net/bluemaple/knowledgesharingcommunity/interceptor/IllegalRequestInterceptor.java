@@ -1,6 +1,7 @@
 package net.bluemaple.knowledgesharingcommunity.interceptor;
 
 import net.bluemaple.knowledgesharingcommunity.service.UserService;
+import net.bluemaple.knowledgesharingcommunity.util.RedisUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,12 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class IllegalRequestInterceptor implements HandlerInterceptor {
     @Resource
-    private UserService userService;
+    private RedisUtil redisUtil;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("token");
-        if(userService.isExistToken(token)){
-            userService.restTokenExpire(token);
+        if(redisUtil.containsKey(token)){
+            redisUtil.resetTokenExpire(token);
             return true;
         }
         response.getWriter().println("{\"code\":300,\"message\":\"illegal request\"}");
